@@ -48,6 +48,34 @@ const emptyMentor: Mentor = {
   socialLinks: {}
 };
 
+// Placeholder function for LinkedIn logo fetching
+// TODO: Replace this with actual backend integration
+const fetchLinkedInLogo = async (linkedInUrl: string): Promise<string> => {
+  // This is a placeholder implementation
+  // In the real implementation, this should:
+  // 1. Call your backend API endpoint
+  // 2. Backend should handle LinkedIn API authentication
+  // 3. Fetch the company logo using LinkedIn's API
+  // 4. Return the logo URL
+  
+  // For now, return a placeholder logo
+  return 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?w=400&h=400&fit=crop';
+};
+
+// Placeholder function for LinkedIn profile picture fetching
+// TODO: Replace this with actual backend integration
+const fetchLinkedInProfilePicture = async (linkedInUrl: string): Promise<string> => {
+  // This is a placeholder implementation
+  // In the real implementation, this should:
+  // 1. Call your backend API endpoint
+  // 2. Backend should handle LinkedIn API authentication
+  // 3. Fetch the user's profile picture using LinkedIn's API
+  // 4. Return the profile picture URL
+  
+  // For now, return a placeholder profile picture
+  return 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop';
+};
+
 export const AdminPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<AdminFormData>(initialFormData);
@@ -63,7 +91,7 @@ export const AdminPage: React.FC = () => {
     }));
   };
 
-  const handleSocialLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSocialLinkChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -72,6 +100,21 @@ export const AdminPage: React.FC = () => {
         [name]: value
       }
     }));
+
+    // If LinkedIn URL is updated, attempt to fetch the logo
+    // TODO: Implement proper error handling and loading states
+    if (name === 'linkedin' && value) {
+      try {
+        const logoUrl = await fetchLinkedInLogo(value);
+        setFormData(prev => ({
+          ...prev,
+          logo: logoUrl
+        }));
+      } catch (error) {
+        console.error('Failed to fetch LinkedIn logo:', error);
+        // TODO: Implement proper error handling UI
+      }
+    }
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,7 +194,31 @@ export const AdminPage: React.FC = () => {
     }));
   };
 
-  const handleMentorChange = (index: number, field: keyof Mentor | keyof SocialLinks, value: string) => {
+  const handleMentorChange = async (index: number, field: keyof Mentor | keyof SocialLinks, value: string) => {
+    // If LinkedIn URL is updated, attempt to fetch the profile picture
+    if (field === 'linkedin' && value) {
+      try {
+        const profilePicUrl = await fetchLinkedInProfilePicture(value);
+        setFormData(prev => ({
+          ...prev,
+          mentors: prev.mentors.map((mentor, i) => 
+            i === index ? 
+            { 
+              ...mentor, 
+              image: profilePicUrl,
+              socialLinks: { ...mentor.socialLinks, [field]: value }
+            } : 
+            mentor
+          )
+        }));
+        return;
+      } catch (error) {
+        console.error('Failed to fetch LinkedIn profile picture:', error);
+        // TODO: Implement proper error handling UI
+      }
+    }
+
+    // Handle regular field changes
     setFormData(prev => ({
       ...prev,
       mentors: prev.mentors.map((mentor, i) => 
@@ -181,6 +248,7 @@ export const AdminPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // TODO: Add form validation
     navigate('/');
   };
 
@@ -354,6 +422,11 @@ export const AdminPage: React.FC = () => {
                   <div key={platform}>
                     <label className="block text-sm font-medium text-gray-300 capitalize">
                       {platform === 'gmail' ? 'Email' : platform} URL
+                      {platform === 'linkedin' && (
+                        <span className="ml-2 text-xs text-cyan-400">
+                          (Logo will be automatically fetched)
+                        </span>
+                      )}
                     </label>
                     <input
                       type={platform === 'gmail' ? 'email' : 'url'}
@@ -554,6 +627,11 @@ export const AdminPage: React.FC = () => {
                           <div key={platform}>
                             <label className="block text-sm font-medium text-gray-300 capitalize">
                               {platform === 'gmail' ? 'Email' : platform} URL
+                              {platform === 'linkedin' && (
+                                <span className="ml-2 text-xs text-cyan-400">
+                                  (Profile picture will be automatically fetched)
+                                </span>
+                              )}
                             </label>
                             <input
                               type={platform === 'gmail' ? 'email' : 'url'}
