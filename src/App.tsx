@@ -1,9 +1,10 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ProjectsPage } from './pages/ProjectsPage';
+import { FeaturesPage } from './pages/FeaturesPage';
 import { OrganizationDetails } from './components/OrganizationDetails';
 import { AdminPage } from './pages/AdminPage';
 import { Navbar } from './components/Navbar';
+import { DocumentationPage } from './pages/DocumentationPage';
 import { Hero } from './components/Hero';
 import { Footer } from './components/Footer';
 import type { Organization } from './types/organization';
@@ -85,6 +86,7 @@ function App() {
               <ProjectsPage initialOrganizations={organizations} />
             </>
           } />
+          <Route path="/features" element={<FeaturesPage />} />
           <Route path="/admin/add" element={<AdminPage />} />
           <Route 
             path="/:organizationName" 
